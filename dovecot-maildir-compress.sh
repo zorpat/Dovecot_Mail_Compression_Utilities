@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# Version: 0.2-stable
+#
 # Find the mails you want to compress in a single maildir.
 #
 #     Skip files that don't have ,S=<size> in the filename. 
@@ -27,9 +29,9 @@
 # Unlock the maildir by sending a TERM signal to the maildirlock process (killing the PID it wrote to stdout). 
 #
 # Usage:
-#
+#	- change variables to meet your requirements
+#	- chmod +x dovecot-maildir-compress.sh
 #	- ./dovecot-maildir-compress.sh /var/vmail/domain.com/
-#
 #
 # !!!!!!!!!!!! A T T E N T I O N !!!!!!!!!!!! 
 #
@@ -44,11 +46,27 @@
 . ./terminal-control.sh
 ## -------- ##
 
+#*************************************************
+# !! Set this variables as needed !!
+#*************************************************
+
 store=$1
 secure=1
 time="-mtime +1"
 #compress=gzip
 compress=bzip2
+
+#################################################################################################################################
+#        D O N T   C H A N G E   A N Y T H I N G   B E L O W   T H I S   L I N E   !!                                           #
+#################################################################################################################################
+
+echo -e "${Bold}${OnRed}******************** (!!) A T T E N T I O N (!!) ********************${Rst}"
+echo -e "${Bold}${OnRed}Are you sure to use \"$compress\" compression?                             ${Rst}"
+echo -e "${Bold}${OnRed}Selecting the wrong compression will corrupt your messages!          ${Rst}"
+echo -e "${Bold}${OnRed}                                                                     ${Rst}"
+echo -e "${Bold}${OnRed}Press Ctrl^C to abort! Or ENTER to continue..                        ${Rst}"
+echo -e "${Bold}${OnRed}******************** (!!) A T T E N T I O N (!!) ********************${Rst}"
+read dummy
 
 find "$store" -type d -name "cur" | while read maildir;
 do
@@ -66,7 +84,7 @@ do
 
 		echo "$find" | while read filename;
 		do
-			zipped=$(bzip2 -qt $maildir/$filename &>/dev/null)
+			zipped=$(bzip2 -qt "$maildir/$filename" &>/dev/null)
 			if [ $? -eq 0 ];
 			then
 				echo -e "${Bold}${Red}\"$filename\" was already zipped before!${Rst}"
